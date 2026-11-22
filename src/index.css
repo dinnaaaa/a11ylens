@@ -14,7 +14,9 @@
   font-optical-sizing: auto;
 }
 
-* {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
@@ -50,4 +52,10 @@ textarea:focus-visible,
 select:focus-visible {
   outline: 3px solid #4F46E5;
   outline-offset: 2px;
+}
+
+img,
+video,
+iframe {
+  max-width: 100%;
 }
