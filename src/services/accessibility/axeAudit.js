@@ -10,7 +10,7 @@ const WCAG_TAGS = [
 ]
 
 /**
- * Run axe-core on a same-origin demo page iframe.
+ * Run axe-core inside the same-origin demo page iframe.
  *
  * @param {HTMLIFrameElement} iframe
  * @returns {Promise<object>}
@@ -20,20 +20,37 @@ export async function runAxeAudit(iframe) {
     throw new Error('Demo page iframe was not provided.')
   }
 
+  const frameWindow = iframe.contentWindow
   const frameDocument = iframe.contentDocument
 
-  if (!frameDocument || !iframe.contentWindow) {
+  if (!frameWindow || !frameDocument || !frameDocument.body) {
     throw new Error(
-      'Unable to access demo page. Make sure the iframe uses the same origin.',
+      'Unable to access the demo page. Make sure the iframe has finished loading and uses the same origin.',
     )
   }
 
-  if (!frameDocument.body) {
-    throw new Error('Demo page has not finished loading.')
-  }
-
   try {
-    const results = await axe.run(frameDocument, {
+    // Load axe-core into the iframe's own JavaScript context.
+    if (!frameWindow.axe) {
+      const script = frameDocument.createElement('script')
+
+      script.id = 'a11ylens-axe-core'
+      script.textContent = axe.source
+
+      frameDocument.head.appendChild(script)
+    }
+
+    if (
+      !frameWindow.axe ||
+      typeof frameWindow.axe.run !== 'function'
+    ) {
+      throw new Error(
+        'Unable to initialize axe-core inside the demo page iframe.',
+      )
+    }
+
+    // Run the audit using the iframe's own axe-core instance.
+    const results = await frameWindow.axe.run({
       runOnly: {
         type: 'tag',
         values: WCAG_TAGS,
