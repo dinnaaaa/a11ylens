@@ -1,4 +1,8 @@
 
+import axe from 'axe-core'
+
+window.axe = axe
+
 function FormDemo() {
   function handleSubmit(event) {
     event.preventDefault()
@@ -17,12 +21,8 @@ function FormDemo() {
         </p>
 
         <form onSubmit={handleSubmit}>
-          {/* Full Name */}
           <div className="mb-3">
-            <label
-              htmlFor="full-name"
-              className="form-label"
-            >
+            <label htmlFor="full-name" className="form-label">
               Full Name
             </label>
 
@@ -38,12 +38,8 @@ function FormDemo() {
             />
           </div>
 
-          {/* Email */}
           <div className="mb-3">
-            <label
-              htmlFor="email"
-              className="form-label"
-            >
+            <label htmlFor="email" className="form-label">
               Email Address
             </label>
 
@@ -59,12 +55,8 @@ function FormDemo() {
             />
           </div>
 
-          {/* Message */}
           <div className="mb-3">
-            <label
-              htmlFor="message"
-              className="form-label"
-            >
+            <label htmlFor="message" className="form-label">
               Message
             </label>
 
@@ -79,10 +71,7 @@ function FormDemo() {
             />
           </div>
 
-          <button
-            type="submit"
-            className="btn btn-primary"
-          >
+          <button type="submit" className="btn btn-primary">
             Submit
           </button>
         </form>

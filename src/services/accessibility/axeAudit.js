@@ -1,6 +1,4 @@
 
-import axe from 'axe-core'
-
 const WCAG_TAGS = [
   'wcag2a',
   'wcag2aa',
@@ -24,40 +22,24 @@ export async function runAxeAudit(iframe) {
   const frameDocument = iframe.contentDocument
 
   if (!frameWindow || !frameDocument || !frameDocument.body) {
+    throw new Error('Unable to access the demo page iframe.')
+  }
+
+  const frameAxe = frameWindow.axe
+
+  if (!frameAxe || typeof frameAxe.run !== 'function') {
     throw new Error(
-      'Unable to access the demo page. Make sure the iframe has finished loading and uses the same origin.',
+      'axe-core is not available inside the demo page iframe.',
     )
   }
 
   try {
-    // Load axe-core into the iframe's own JavaScript context.
-    if (!frameWindow.axe) {
-      const script = frameDocument.createElement('script')
-
-      script.id = 'a11ylens-axe-core'
-      script.textContent = axe.source
-
-      frameDocument.head.appendChild(script)
-    }
-
-    if (
-      !frameWindow.axe ||
-      typeof frameWindow.axe.run !== 'function'
-    ) {
-      throw new Error(
-        'Unable to initialize axe-core inside the demo page iframe.',
-      )
-    }
-
-    // Run the audit using the iframe's own axe-core instance.
-    const results = await frameWindow.axe.run({
+    return await frameAxe.run({
       runOnly: {
         type: 'tag',
         values: WCAG_TAGS,
       },
     })
-
-    return results
   } catch (error) {
     throw new Error(
       `Accessibility audit failed: ${
