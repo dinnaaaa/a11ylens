@@ -20,10 +20,9 @@ export async function runAxeAudit(iframe) {
     throw new Error('Demo page iframe was not provided.')
   }
 
-  const frameWindow = iframe.contentWindow
   const frameDocument = iframe.contentDocument
 
-  if (!frameWindow || !frameDocument) {
+  if (!frameDocument || !iframe.contentWindow) {
     throw new Error(
       'Unable to access demo page. Make sure the iframe uses the same origin.',
     )
@@ -34,23 +33,7 @@ export async function runAxeAudit(iframe) {
   }
 
   try {
-    // Inject axe-core into the demo page iframe.
-    if (!frameWindow.axe) {
-      const script = frameDocument.createElement('script')
-
-      script.id = 'a11ylens-axe-core'
-      script.textContent = axe.source
-
-      frameDocument.head.appendChild(script)
-    }
-
-    if (!frameWindow.axe) {
-      throw new Error(
-        'Failed to initialize axe-core in the demo page.',
-      )
-    }
-
-    const results = await frameWindow.axe.run(frameDocument, {
+    const results = await axe.run(frameDocument, {
       runOnly: {
         type: 'tag',
         values: WCAG_TAGS,
